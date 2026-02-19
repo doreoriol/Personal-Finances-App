@@ -1,60 +1,47 @@
 package com.example.demo.model;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "transactions")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Transaction {
-
+public class User {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private TransactionType type;
-
-    @NotNull
-    @Positive
-    private BigDecimal amount;
-
     @NotBlank
-    private String description;
+    private String name;
 
-    @NotNull
-    private LocalDate date;
-
+    @Column(nullable = false, unique = true, length = 150)
+    @Email
     @NotBlank
-    private String category;
+    private String email;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(nullable = false, length = 255)
+    @JsonIgnore
+    @NotBlank
+    private String passwordHash;
 
-    private String paymentMethod;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
