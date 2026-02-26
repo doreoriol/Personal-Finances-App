@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.AuthResponse;
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.model.User;
@@ -30,14 +31,15 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public User register(@Valid @RequestBody RegisterRequest request) {
-       return authService.register(request);
+    public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
+        User user = authService.register(request);
+        return new AuthResponse("User registered", user.getId(), user.getEmail());
     }
     
     @PostMapping("/login")
-    public User login(@Valid @RequestBody LoginRequest request) {
-        return authService.login(request);
+    public AuthResponse login(@Valid @RequestBody LoginRequest request) {
+        User user = authService.login(request);
+        return new AuthResponse("Login successful", user.getId(), user.getEmail());
     }
-    
     
 }
