@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.TransactionRequest;
 import com.example.demo.model.Transaction;
 import com.example.demo.service.TransactionService;
 
@@ -42,12 +43,12 @@ public class TransactionController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Transaction create(@Valid @RequestBody Transaction transaction) {
+    public Transaction create(@Valid @RequestBody TransactionRequest transaction) {
         return transactionService.create(transaction);
     }
 
     @PutMapping("/{id}")
-    public Transaction update(@PathVariable Long id, @Valid @RequestBody Transaction transaction) {
+    public Transaction update(@PathVariable Long id, @Valid @RequestBody TransactionRequest transaction) {
         return transactionService.update(id, transaction);
     }
 
