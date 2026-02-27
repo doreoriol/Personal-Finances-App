@@ -3,7 +3,6 @@ package com.example.demo.dto;
 import java.math.BigDecimal;
 
 import com.example.demo.enums.AccountType;
-import com.example.demo.model.User;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -31,5 +30,5 @@ public class AccountRequest {
     private String currency;
 
     @NotNull
-    private User user;
+    private Long user_id;
 }
