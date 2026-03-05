@@ -13,21 +13,27 @@ import com.example.demo.model.Category;
 public class CategoryService {
     
     private final CategoryRepository categoryRepository;
+    private final CurrentUserService currentUserService;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, CurrentUserService currentUserService) {
         this.categoryRepository = categoryRepository;
+        this.currentUserService = currentUserService;
     }
 
     public List<Category> findAll() {
-        return categoryRepository.findAll();
+        long userId = currentUserService.getCurrentUser().getId();
+        return categoryRepository.findByUserId(userId);
     }
 
     public Category findById(Long id) {
-        return categoryRepository.findById(id)
+        long userId = currentUserService.getCurrentUser().getId();
+        return categoryRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
     }
 
     public Category create (Category category) {
+        var user = currentUserService.getCurrentUser();
+        category.setUser(user);
         return categoryRepository.save(category);
     }
 
@@ -35,6 +41,7 @@ public class CategoryService {
         Category existing = findById(id);
         existing.setName(category.getName());
         existing.setType(category.getType());
+        existing.setUser(currentUserService.getCurrentUser());
         return categoryRepository.save(existing);
     }
 

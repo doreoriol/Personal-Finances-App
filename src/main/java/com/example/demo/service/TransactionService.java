@@ -1,12 +1,14 @@
 package com.example.demo.service;
 
+import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
-import com.example.demo.service.CurrentUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.dto.TransactionRequest;
+import com.example.demo.dto.TransactionPageResponse;
 import com.example.demo.model.Category;
 import com.example.demo.model.Transaction;
 import com.example.demo.model.User;
@@ -31,6 +33,45 @@ public class TransactionService {
     public List<Transaction> findAll() {
         long userId = currentUserService.getCurrentUser().getId();
         return transactionRepository.findByUserId(userId);
+    }
+
+    public TransactionPageResponse findAllPaged(LocalDate from, LocalDate to, Long categoryId, int page, int size) {
+        var user = currentUserService.getCurrentUser();
+
+        LocalDate start = from != null ? from : LocalDate.now().withDayOfMonth(1);
+        LocalDate end = to != null ? to : LocalDate.now();
+
+        List<Transaction> all = transactionRepository.findByUserIdAndDateBetween(user.getId(), start, end);
+
+        if (categoryId != null) {
+            all = all.stream()
+                    .filter(t -> t.getCategory().getId() == categoryId)
+                    .toList();
+        }
+
+        all = all.stream()
+                .sorted(Comparator.comparing(Transaction::getDate).reversed()
+                        .thenComparing(Transaction::getId).reversed())
+                .toList();
+
+        int totalElements = all.size();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        int fromIndex = page * size;
+        int toIndex = Math.min(fromIndex + size, totalElements);
+
+        List<Transaction> pageContent = List.of();
+        if (fromIndex < totalElements) {
+            pageContent = all.subList(fromIndex, toIndex);
+        }
+
+        TransactionPageResponse response = new TransactionPageResponse();
+        response.setContent(pageContent);
+        response.setPage(page);
+        response.setSize(size);
+        response.setTotalElements(totalElements);
+        response.setTotalPages(totalPages);
+
+        return response;
     }
 
     public Transaction findById(Long id) {
