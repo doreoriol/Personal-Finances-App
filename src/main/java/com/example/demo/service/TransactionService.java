@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
 import java.util.List;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.service.CurrentUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,28 +18,31 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
-    private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
 
-    public TransactionService(TransactionRepository transactionRepository, CategoryRepository categoryRepository,
-            UserRepository userRepository) {
+    public TransactionService(TransactionRepository transactionRepository,
+                              CategoryRepository categoryRepository,
+                              CurrentUserService currentUserService) {
         this.transactionRepository = transactionRepository;
         this.categoryRepository = categoryRepository;
-        this.userRepository = userRepository;
+        this.currentUserService = currentUserService;
     }
 
     public List<Transaction> findAll() {
-        return transactionRepository.findAll();
+        long userId = currentUserService.getCurrentUser().getId();
+        return transactionRepository.findByUserId(userId);
     }
 
     public Transaction findById(Long id) {
-        return transactionRepository.findById(id)
+        long userId = currentUserService.getCurrentUser().getId();
+        return transactionRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
     }
 
     public Transaction create(TransactionRequest request) {
         Transaction transaction = new Transaction();
         Category category = findCategoryById(request.getCategory_id());
-        User user = findUserById(request.getUser_id());
+        User user = currentUserService.getCurrentUser();
 
         transaction.setAmount(request.getAmount());
         transaction.setDescription(request.getDescription());
@@ -54,7 +57,7 @@ public class TransactionService {
     public Transaction update(Long id, TransactionRequest request) {
         Transaction transaction = findById(id);
         Category category = findCategoryById(request.getCategory_id());
-        User user = findUserById(request.getUser_id());
+        User user = currentUserService.getCurrentUser();
 
         transaction.setType(request.getType());
         transaction.setAmount(request.getAmount());
@@ -76,8 +79,4 @@ public class TransactionService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
     }
 
-    public User findUserById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-    }
 }

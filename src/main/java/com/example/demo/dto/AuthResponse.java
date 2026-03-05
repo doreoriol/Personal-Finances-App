@@ -1,15 +1,17 @@
 package com.example.demo.dto;
 
 public class AuthResponse {
-    
+
     private String message;
     private long userId;
     private String email;
-    
-    public AuthResponse(String message, long userId, String email) {
+    private String accessToken;
+
+    public AuthResponse(String message, long userId, String email, String accessToken) {
         this.message = message;
         this.userId = userId;
         this.email = email;
+        this.accessToken = accessToken;
     }
 
     public String getMessage() {
@@ -34,6 +36,14 @@ public class AuthResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
 }
