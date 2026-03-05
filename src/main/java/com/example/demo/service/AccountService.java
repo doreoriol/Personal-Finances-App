@@ -8,33 +8,33 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.dto.AccountRequest;
 import com.example.demo.model.Account;
-import com.example.demo.model.User;
 import com.example.demo.repository.AccountRepository;
-import com.example.demo.repository.UserRepository;
 
 @Service
 public class AccountService {
     
     private final AccountRepository accountRepository;
-    private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
 
-    public AccountService(AccountRepository accountRepository, UserRepository userRepository) {
+    public AccountService(AccountRepository accountRepository, CurrentUserService currentUserService) {
         this.accountRepository = accountRepository;
-        this.userRepository = userRepository;
+        this.currentUserService = currentUserService;
     }
 
     public List<Account> findAll() {
-        return accountRepository.findAll();
+        long userId = currentUserService.getCurrentUser().getId();
+        return accountRepository.findByUserId(userId);
     }
 
     public Account findById(Long id) {
-        return accountRepository.findById(id)
+        long userId = currentUserService.getCurrentUser().getId();
+        return accountRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
     }
 
     public Account create(AccountRequest request) {
         Account account = new Account();
-        User user = findUserById(request.getUser_id());
+        var user = currentUserService.getCurrentUser();
 
         account.setName(request.getName());
         account.setType(request.getType());
@@ -46,7 +46,7 @@ public class AccountService {
 
     public Account update(Long id, AccountRequest request) {
         Account existing = findById(id);
-        User user = findUserById(request.getUser_id());
+        var user = currentUserService.getCurrentUser();
 
         existing.setName(request.getName());
         existing.setType(request.getType());
@@ -59,10 +59,5 @@ public class AccountService {
     public void delete(Long id) {
         Account existing = findById(id);
         accountRepository.delete(existing);
-    }
-
-    public User findUserById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 }

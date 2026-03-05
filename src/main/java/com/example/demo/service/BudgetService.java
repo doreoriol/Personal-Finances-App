@@ -12,33 +12,36 @@ import com.example.demo.model.Category;
 import com.example.demo.model.User;
 import com.example.demo.repository.BudgetRepository;
 import com.example.demo.repository.CategoryRepository;
-import com.example.demo.repository.UserRepository;
 
 @Service
 public class BudgetService {
 
     private final BudgetRepository budgetRepository;
     private final CategoryRepository categoryRepository;
-    private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
 
-    public BudgetService(BudgetRepository budgetRepository, CategoryRepository categoryRepository, UserRepository userRepository) {
+    public BudgetService(BudgetRepository budgetRepository,
+                         CategoryRepository categoryRepository,
+                         CurrentUserService currentUserService) {
         this.budgetRepository = budgetRepository;
         this.categoryRepository = categoryRepository;
-        this.userRepository = userRepository;
+        this.currentUserService = currentUserService;
     }
 
     public List<Budget> findAll() {
-        return budgetRepository.findAll();
+        long userId = currentUserService.getCurrentUser().getId();
+        return budgetRepository.findByUserId(userId);
     }
 
     public Budget findById(Long id) {
-        return budgetRepository.findById(id)
+        long userId = currentUserService.getCurrentUser().getId();
+        return budgetRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Budget not found"));
     }
 
     public Budget create(BudgetRequest budgetRequest) {
         Category category = findCategoryById(budgetRequest.getCategoryId());
-        User user = findUserById(budgetRequest.getUserId());
+        User user = currentUserService.getCurrentUser();
 
         Budget budget = new Budget();
         budget.setMonth(budgetRequest.getMonth());
@@ -51,7 +54,7 @@ public class BudgetService {
 
     public Budget update(Long id, BudgetRequest budgetRequest) {
         Category category = findCategoryById(budgetRequest.getCategoryId());
-        User user = findUserById(budgetRequest.getUserId());
+        User user = currentUserService.getCurrentUser();
 
         Budget existing = findById(id);
         existing.setMonth(budgetRequest.getMonth());
@@ -72,8 +75,4 @@ public class BudgetService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
     }
 
-    private User findUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-    }
 }
