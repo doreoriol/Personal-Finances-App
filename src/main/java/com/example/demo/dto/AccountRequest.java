@@ -28,7 +28,4 @@ public class AccountRequest {
 
     @NotBlank
     private String currency;
-
-    @NotNull
-    private Long user_id;
 }

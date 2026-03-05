@@ -33,11 +33,8 @@ public class TransactionRequest {
     @NotNull
     private LocalDate date;
 
-    @NotBlank
+    @NotNull
     private Long category_id;
-
-    @NotBlank
-    private Long user_id;
 
     @NotBlank
     private String paymentMethod;

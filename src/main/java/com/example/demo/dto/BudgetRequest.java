@@ -28,7 +28,4 @@ public class BudgetRequest {
 
     @NotNull
     private Long categoryId;
-
-    @NotNull
-    private Long userId;
 }
