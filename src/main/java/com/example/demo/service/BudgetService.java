@@ -71,7 +71,8 @@ public class BudgetService {
     }
 
     private Category findCategoryById(Long categoryId) {
-        return categoryRepository.findById(categoryId)
+        long userId = currentUserService.getCurrentUser().getId();
+        return categoryRepository.findByIdAndUserId(categoryId, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
     }
 

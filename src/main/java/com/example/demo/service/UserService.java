@@ -1,13 +1,9 @@
 package com.example.demo.service;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.demo.dto.UserCreateRequest;
 import com.example.demo.dto.UserUpdateRequest;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
@@ -16,40 +12,31 @@ import com.example.demo.repository.UserRepository;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final CurrentUserService currentUserService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, CurrentUserService currentUserService) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.currentUserService = currentUserService;
     }
 
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public User getCurrentUserProfile() {
+        return currentUserService.getCurrentUser();
     }
 
-    public User findById(long id) {
-        return userRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    public User updateCurrentUser(UserUpdateRequest request) {
+        User currentUser = currentUserService.getCurrentUser();
+        if (!currentUser.getEmail().equals(request.getEmail())
+                && userRepository.existsByEmail(request.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
+        }
+
+        currentUser.setName(request.getName());
+        currentUser.setEmail(request.getEmail());
+        return userRepository.save(currentUser);
     }
 
-    public User createUser(UserCreateRequest request) {
-        User user = new User();
-        user.setName(request.getName());
-        user.setEmail(request.getEmail());
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        return userRepository.save(user);
+    public void deleteCurrentUser() {
+        User currentUser = currentUserService.getCurrentUser();
+        userRepository.delete(currentUser);
     }
-
-    public User updateUser(long id, UserUpdateRequest request) {
-        User existing = findById(id);
-        existing.setName(request.getName());
-        existing.setEmail(request.getEmail());
-        return userRepository.save(existing);
-    }
-
-    public void deleteUser(long id) {
-        User existing = findById(id);
-        userRepository.delete(existing);
-    }
-    
 }

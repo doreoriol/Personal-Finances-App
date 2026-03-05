@@ -3,6 +3,7 @@ package com.example.demo.service;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -45,7 +46,7 @@ public class TransactionService {
 
         if (categoryId != null) {
             all = all.stream()
-                    .filter(t -> t.getCategory().getId() == categoryId)
+                    .filter(t -> Objects.equals(t.getCategory().getId(), categoryId))
                     .toList();
         }
 
@@ -116,7 +117,8 @@ public class TransactionService {
     }
 
     public Category findCategoryById(Long id) {
-        return categoryRepository.findById(id)
+        long userId = currentUserService.getCurrentUser().getId();
+        return categoryRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
     }
 
