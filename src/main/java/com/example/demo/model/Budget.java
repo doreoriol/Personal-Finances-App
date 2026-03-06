@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,6 +32,8 @@ public class Budget {
     private Long id;
 
     @NotNull
+    @Convert(converter = YearMonthAttributeConverter.class)
+    @Column(name = "month", nullable = false, length = 7)
     private YearMonth month;
 
     @NotNull

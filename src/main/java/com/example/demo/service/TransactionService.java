@@ -90,7 +90,7 @@ public class TransactionService {
 
     public TransactionResponse create(TransactionRequest request) {
         Transaction transaction = new Transaction();
-        Category category = findCategoryById(request.getCategory_id());
+        Category category = findCategoryById(request.getCategoryId());
         User user = currentUserService.getCurrentUser();
 
         transaction.setAmount(request.getAmount());
@@ -106,7 +106,7 @@ public class TransactionService {
     public TransactionResponse update(Long id, TransactionRequest request) {
         long userId = currentUserService.getCurrentUser().getId();
         Transaction transaction = findEntityByIdAndUserId(id, userId);
-        Category category = findCategoryById(request.getCategory_id());
+        Category category = findCategoryById(request.getCategoryId());
         User user = currentUserService.getCurrentUser();
 
         transaction.setType(request.getType());
