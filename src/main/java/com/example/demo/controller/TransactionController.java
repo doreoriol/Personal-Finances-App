@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.TransactionPageResponse;
 import com.example.demo.dto.TransactionRequest;
-import com.example.demo.model.Transaction;
+import com.example.demo.dto.TransactionResponse;
 import com.example.demo.service.TransactionService;
 
 import jakarta.validation.Valid;
@@ -36,7 +36,7 @@ public class TransactionController {
     }
 
     @GetMapping
-    public List<Transaction> getAll() {
+    public List<TransactionResponse> getAll() {
         return transactionService.findAll();
     }
 
@@ -51,18 +51,18 @@ public class TransactionController {
     }
 
     @GetMapping("/{id}")
-    public Transaction getById(@PathVariable Long id) {
+    public TransactionResponse getById(@PathVariable Long id) {
         return transactionService.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Transaction create(@Valid @RequestBody TransactionRequest transaction) {
+    public TransactionResponse create(@Valid @RequestBody TransactionRequest transaction) {
         return transactionService.create(transaction);
     }
 
     @PutMapping("/{id}")
-    public Transaction update(@PathVariable Long id, @Valid @RequestBody TransactionRequest transaction) {
+    public TransactionResponse update(@PathVariable Long id, @Valid @RequestBody TransactionRequest transaction) {
         return transactionService.update(id, transaction);
     }
 

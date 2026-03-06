@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.demo.dto.BudgetResponse;
 import com.example.demo.dto.BudgetRequest;
 import com.example.demo.model.Budget;
 import com.example.demo.model.Category;
@@ -19,27 +20,31 @@ public class BudgetService {
     private final BudgetRepository budgetRepository;
     private final CategoryRepository categoryRepository;
     private final CurrentUserService currentUserService;
+    private final ResponseMapper responseMapper;
 
     public BudgetService(BudgetRepository budgetRepository,
                          CategoryRepository categoryRepository,
-                         CurrentUserService currentUserService) {
+                         CurrentUserService currentUserService,
+                         ResponseMapper responseMapper) {
         this.budgetRepository = budgetRepository;
         this.categoryRepository = categoryRepository;
         this.currentUserService = currentUserService;
+        this.responseMapper = responseMapper;
     }
 
-    public List<Budget> findAll() {
+    public List<BudgetResponse> findAll() {
         long userId = currentUserService.getCurrentUser().getId();
-        return budgetRepository.findByUserId(userId);
+        return budgetRepository.findByUserId(userId).stream()
+                .map(responseMapper::toBudgetResponse)
+                .toList();
     }
 
-    public Budget findById(Long id) {
+    public BudgetResponse findById(Long id) {
         long userId = currentUserService.getCurrentUser().getId();
-        return budgetRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Budget not found"));
+        return responseMapper.toBudgetResponse(findEntityByIdAndUserId(id, userId));
     }
 
-    public Budget create(BudgetRequest budgetRequest) {
+    public BudgetResponse create(BudgetRequest budgetRequest) {
         Category category = findCategoryById(budgetRequest.getCategoryId());
         User user = currentUserService.getCurrentUser();
 
@@ -49,24 +54,25 @@ public class BudgetService {
         budget.setSpentAmount(budgetRequest.getSpentAmount());
         budget.setCategory(category);
         budget.setUser(user);
-        return budgetRepository.save(budget);
+        return responseMapper.toBudgetResponse(budgetRepository.save(budget));
     }
 
-    public Budget update(Long id, BudgetRequest budgetRequest) {
+    public BudgetResponse update(Long id, BudgetRequest budgetRequest) {
         Category category = findCategoryById(budgetRequest.getCategoryId());
         User user = currentUserService.getCurrentUser();
 
-        Budget existing = findById(id);
+        Budget existing = findEntityByIdAndUserId(id, user.getId());
         existing.setMonth(budgetRequest.getMonth());
         existing.setLimitAmount(budgetRequest.getLimitAmount());
         existing.setSpentAmount(budgetRequest.getSpentAmount());
         existing.setCategory(category);
         existing.setUser(user);
-        return budgetRepository.save(existing);
+        return responseMapper.toBudgetResponse(budgetRepository.save(existing));
     }
 
     public void delete(Long id) {
-        Budget existing = findById(id);
+        long userId = currentUserService.getCurrentUser().getId();
+        Budget existing = findEntityByIdAndUserId(id, userId);
         budgetRepository.delete(existing);
     }
 
@@ -74,6 +80,11 @@ public class BudgetService {
         long userId = currentUserService.getCurrentUser().getId();
         return categoryRepository.findByIdAndUserId(categoryId, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
+    }
+
+    private Budget findEntityByIdAndUserId(Long id, long userId) {
+        return budgetRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Budget not found"));
     }
 
 }

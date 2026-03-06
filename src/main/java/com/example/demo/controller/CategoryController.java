@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.CategoryResponse;
 import com.example.demo.model.Category;
 import com.example.demo.service.CategoryService;
 
@@ -33,23 +34,23 @@ public class CategoryController {
     }
 
     @GetMapping
-    public List<Category> getAll() {
+    public List<CategoryResponse> getAll() {
         return categoryService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Category getById(@PathVariable Long id) {
+    public CategoryResponse getById(@PathVariable Long id) {
         return categoryService.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Category create(@Valid @RequestBody Category category) {
+    public CategoryResponse create(@Valid @RequestBody Category category) {
         return categoryService.create(category);
     }
 
     @PutMapping("/{id}")
-    public Category update(@PathVariable Long id, @Valid @RequestBody Category category) {
+    public CategoryResponse update(@PathVariable Long id, @Valid @RequestBody Category category) {
         return categoryService.update(id, category);
     }
 

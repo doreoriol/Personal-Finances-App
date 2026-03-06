@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.UserProfileResponse;
 import com.example.demo.dto.UserUpdateRequest;
-import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 
 import jakarta.validation.Valid;
@@ -28,12 +28,12 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public User getCurrentUser() {
+    public UserProfileResponse getCurrentUser() {
         return userService.getCurrentUserProfile();
     }
 
     @PutMapping("/me")
-    public User updateCurrentUser(@Valid @RequestBody UserUpdateRequest userRequest) {
+    public UserProfileResponse updateCurrentUser(@Valid @RequestBody UserUpdateRequest userRequest) {
         return userService.updateCurrentUser(userRequest);
     }
 

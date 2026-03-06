@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.AccountRequest;
-import com.example.demo.model.Account;
+import com.example.demo.dto.AccountResponse;
 import com.example.demo.service.AccountService;
 
 import jakarta.validation.Valid;
@@ -36,23 +36,23 @@ public class AccountController {
     }
 
     @GetMapping
-    public List<Account> getAll() {
+    public List<AccountResponse> getAll() {
         return accountService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Account getById(@PathVariable Long id) {
+    public AccountResponse getById(@PathVariable Long id) {
         return accountService.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Account create(@Valid @RequestBody AccountRequest accountRequest) {
+    public AccountResponse create(@Valid @RequestBody AccountRequest accountRequest) {
         return accountService.create(accountRequest);
     }
 
     @PutMapping("/{id}")
-    public Account update(@Valid @RequestBody AccountRequest accountRequest, @PathVariable Long id) {
+    public AccountResponse update(@Valid @RequestBody AccountRequest accountRequest, @PathVariable Long id) {
         return accountService.update(id, accountRequest);
     }
     

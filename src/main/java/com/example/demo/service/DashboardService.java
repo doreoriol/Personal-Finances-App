@@ -7,7 +7,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dto.AccountResponse;
 import com.example.demo.dto.DashboardSummaryResponse;
+import com.example.demo.dto.TransactionResponse;
 import com.example.demo.dto.TransactionSummaryResponse;
 import com.example.demo.dto.TransactionSummaryResponse.CategoryTotal;
 import com.example.demo.enums.TransactionType;
@@ -22,13 +24,16 @@ public class DashboardService {
     private final CurrentUserService currentUserService;
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
+    private final ResponseMapper responseMapper;
 
     public DashboardService(CurrentUserService currentUserService,
                             AccountRepository accountRepository,
-                            TransactionRepository transactionRepository) {
+                            TransactionRepository transactionRepository,
+                            ResponseMapper responseMapper) {
         this.currentUserService = currentUserService;
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
+        this.responseMapper = responseMapper;
     }
 
     public DashboardSummaryResponse getDashboardSummary(Integer year, Integer month) {
@@ -45,6 +50,12 @@ public class DashboardService {
         List<Account> accounts = accountRepository.findByUserId(userId);
         List<Transaction> monthTransactions = transactionRepository.findByUserIdAndDateBetween(userId, from, to);
         List<Transaction> recentTransactions = transactionRepository.findTop5ByUserIdOrderByDateDesc(userId);
+        List<AccountResponse> accountResponses = accounts.stream()
+                .map(responseMapper::toAccountResponse)
+                .toList();
+        List<TransactionResponse> recentTransactionResponses = recentTransactions.stream()
+                .map(responseMapper::toTransactionResponse)
+                .toList();
 
         BigDecimal totalBalance = accounts.stream()
                 .map(Account::getBalance)
@@ -53,8 +64,8 @@ public class DashboardService {
         TransactionSummaryResponse summary = buildTransactionSummary(monthTransactions);
 
         DashboardSummaryResponse response = new DashboardSummaryResponse();
-        response.setAccounts(accounts);
-        response.setRecentTransactions(recentTransactions);
+        response.setAccounts(accountResponses);
+        response.setRecentTransactions(recentTransactionResponses);
         response.setTotalBalance(totalBalance);
         response.setTotalIncomeCurrentMonth(summary.getTotalIncome());
         response.setTotalExpenseCurrentMonth(summary.getTotalExpense());

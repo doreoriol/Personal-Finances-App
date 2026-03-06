@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.demo.dto.CategoryResponse;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.model.Category;
 
@@ -14,40 +15,52 @@ public class CategoryService {
     
     private final CategoryRepository categoryRepository;
     private final CurrentUserService currentUserService;
+    private final ResponseMapper responseMapper;
 
-    public CategoryService(CategoryRepository categoryRepository, CurrentUserService currentUserService) {
+    public CategoryService(CategoryRepository categoryRepository,
+                           CurrentUserService currentUserService,
+                           ResponseMapper responseMapper) {
         this.categoryRepository = categoryRepository;
         this.currentUserService = currentUserService;
+        this.responseMapper = responseMapper;
     }
 
-    public List<Category> findAll() {
+    public List<CategoryResponse> findAll() {
         long userId = currentUserService.getCurrentUser().getId();
-        return categoryRepository.findByUserId(userId);
+        return categoryRepository.findByUserId(userId).stream()
+                .map(responseMapper::toCategoryResponse)
+                .toList();
     }
 
-    public Category findById(Long id) {
+    public CategoryResponse findById(Long id) {
         long userId = currentUserService.getCurrentUser().getId();
-        return categoryRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
+        return responseMapper.toCategoryResponse(findEntityByIdAndUserId(id, userId));
     }
 
-    public Category create (Category category) {
+    public CategoryResponse create (Category category) {
         var user = currentUserService.getCurrentUser();
         category.setUser(user);
-        return categoryRepository.save(category);
+        return responseMapper.toCategoryResponse(categoryRepository.save(category));
     }
 
-    public Category update (Long id, Category category) {
-        Category existing = findById(id);
+    public CategoryResponse update (Long id, Category category) {
+        long userId = currentUserService.getCurrentUser().getId();
+        Category existing = findEntityByIdAndUserId(id, userId);
         existing.setName(category.getName());
         existing.setType(category.getType());
         existing.setUser(currentUserService.getCurrentUser());
-        return categoryRepository.save(existing);
+        return responseMapper.toCategoryResponse(categoryRepository.save(existing));
     }
 
     public void delete(Long id) {
-        Category existing = findById(id);
+        long userId = currentUserService.getCurrentUser().getId();
+        Category existing = findEntityByIdAndUserId(id, userId);
         categoryRepository.delete(existing);
+    }
+
+    private Category findEntityByIdAndUserId(Long id, long userId) {
+        return categoryRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
     }
 
 }

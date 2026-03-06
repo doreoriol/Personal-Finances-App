@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.BudgetResponse;
 import com.example.demo.dto.BudgetRequest;
-import com.example.demo.model.Budget;
 import com.example.demo.service.BudgetService;
 
 import jakarta.validation.Valid;
@@ -35,23 +35,23 @@ public class BudgetController {
     }
 
     @GetMapping
-    public List<Budget> getAll() {
+    public List<BudgetResponse> getAll() {
         return budgetService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Budget getById(@PathVariable Long id) {
+    public BudgetResponse getById(@PathVariable Long id) {
         return budgetService.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Budget create(@Valid @RequestBody BudgetRequest entity) {
+    public BudgetResponse create(@Valid @RequestBody BudgetRequest entity) {
         return budgetService.create(entity);
     }
 
     @PutMapping("/{id}")
-    public Budget update(@PathVariable Long id, @Valid @RequestBody BudgetRequest entity) {
+    public BudgetResponse update(@PathVariable Long id, @Valid @RequestBody BudgetRequest entity) {
         return budgetService.update(id, entity);
     }
     

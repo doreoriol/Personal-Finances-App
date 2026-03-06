@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.demo.dto.TransactionResponse;
 import com.example.demo.dto.TransactionRequest;
 import com.example.demo.dto.TransactionPageResponse;
 import com.example.demo.model.Category;
@@ -22,18 +23,23 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
     private final CurrentUserService currentUserService;
+    private final ResponseMapper responseMapper;
 
     public TransactionService(TransactionRepository transactionRepository,
                               CategoryRepository categoryRepository,
-                              CurrentUserService currentUserService) {
+                              CurrentUserService currentUserService,
+                              ResponseMapper responseMapper) {
         this.transactionRepository = transactionRepository;
         this.categoryRepository = categoryRepository;
         this.currentUserService = currentUserService;
+        this.responseMapper = responseMapper;
     }
 
-    public List<Transaction> findAll() {
+    public List<TransactionResponse> findAll() {
         long userId = currentUserService.getCurrentUser().getId();
-        return transactionRepository.findByUserId(userId);
+        return transactionRepository.findByUserId(userId).stream()
+                .map(responseMapper::toTransactionResponse)
+                .toList();
     }
 
     public TransactionPageResponse findAllPaged(LocalDate from, LocalDate to, Long categoryId, int page, int size) {
@@ -60,9 +66,11 @@ public class TransactionService {
         int fromIndex = page * size;
         int toIndex = Math.min(fromIndex + size, totalElements);
 
-        List<Transaction> pageContent = List.of();
+        List<TransactionResponse> pageContent = List.of();
         if (fromIndex < totalElements) {
-            pageContent = all.subList(fromIndex, toIndex);
+            pageContent = all.subList(fromIndex, toIndex).stream()
+                    .map(responseMapper::toTransactionResponse)
+                    .toList();
         }
 
         TransactionPageResponse response = new TransactionPageResponse();
@@ -75,13 +83,12 @@ public class TransactionService {
         return response;
     }
 
-    public Transaction findById(Long id) {
+    public TransactionResponse findById(Long id) {
         long userId = currentUserService.getCurrentUser().getId();
-        return transactionRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
+        return responseMapper.toTransactionResponse(findEntityByIdAndUserId(id, userId));
     }
 
-    public Transaction create(TransactionRequest request) {
+    public TransactionResponse create(TransactionRequest request) {
         Transaction transaction = new Transaction();
         Category category = findCategoryById(request.getCategory_id());
         User user = currentUserService.getCurrentUser();
@@ -93,11 +100,12 @@ public class TransactionService {
         transaction.setCategory(category);
         transaction.setUser(user);
         transaction.setPaymentMethod(request.getPaymentMethod());
-        return transactionRepository.save(transaction);
+        return responseMapper.toTransactionResponse(transactionRepository.save(transaction));
     }
 
-    public Transaction update(Long id, TransactionRequest request) {
-        Transaction transaction = findById(id);
+    public TransactionResponse update(Long id, TransactionRequest request) {
+        long userId = currentUserService.getCurrentUser().getId();
+        Transaction transaction = findEntityByIdAndUserId(id, userId);
         Category category = findCategoryById(request.getCategory_id());
         User user = currentUserService.getCurrentUser();
 
@@ -108,11 +116,12 @@ public class TransactionService {
         transaction.setCategory(category);
         transaction.setUser(user);
         transaction.setPaymentMethod(request.getPaymentMethod());
-        return transactionRepository.save(transaction);
+        return responseMapper.toTransactionResponse(transactionRepository.save(transaction));
     }
 
     public void delete(Long id) {
-        Transaction existing = findById(id);
+        long userId = currentUserService.getCurrentUser().getId();
+        Transaction existing = findEntityByIdAndUserId(id, userId);
         transactionRepository.delete(existing);
     }
 
@@ -120,6 +129,11 @@ public class TransactionService {
         long userId = currentUserService.getCurrentUser().getId();
         return categoryRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
+    }
+
+    private Transaction findEntityByIdAndUserId(Long id, long userId) {
+        return transactionRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
     }
 
 }
