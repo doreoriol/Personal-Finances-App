@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.demo.dto.CategoryRequest;
 import com.example.demo.dto.CategoryResponse;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.model.Category;
@@ -37,17 +38,20 @@ public class CategoryService {
         return responseMapper.toCategoryResponse(findEntityByIdAndUserId(id, userId));
     }
 
-    public CategoryResponse create (Category category) {
+    public CategoryResponse create(CategoryRequest categoryRequest) {
+        Category category = new Category();
         var user = currentUserService.getCurrentUser();
+        category.setName(categoryRequest.getName());
+        category.setType(categoryRequest.getType());
         category.setUser(user);
         return responseMapper.toCategoryResponse(categoryRepository.save(category));
     }
 
-    public CategoryResponse update (Long id, Category category) {
+    public CategoryResponse update(Long id, CategoryRequest categoryRequest) {
         long userId = currentUserService.getCurrentUser().getId();
         Category existing = findEntityByIdAndUserId(id, userId);
-        existing.setName(category.getName());
-        existing.setType(category.getType());
+        existing.setName(categoryRequest.getName());
+        existing.setType(categoryRequest.getType());
         existing.setUser(currentUserService.getCurrentUser());
         return responseMapper.toCategoryResponse(categoryRepository.save(existing));
     }

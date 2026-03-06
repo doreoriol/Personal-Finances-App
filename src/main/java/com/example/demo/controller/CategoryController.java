@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.CategoryRequest;
 import com.example.demo.dto.CategoryResponse;
-import com.example.demo.model.Category;
 import com.example.demo.service.CategoryService;
 
 import jakarta.validation.Valid;
@@ -45,13 +45,13 @@ public class CategoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryResponse create(@Valid @RequestBody Category category) {
-        return categoryService.create(category);
+    public CategoryResponse create(@Valid @RequestBody CategoryRequest categoryRequest) {
+        return categoryService.create(categoryRequest);
     }
 
     @PutMapping("/{id}")
-    public CategoryResponse update(@PathVariable Long id, @Valid @RequestBody Category category) {
-        return categoryService.update(id, category);
+    public CategoryResponse update(@PathVariable Long id, @Valid @RequestBody CategoryRequest categoryRequest) {
+        return categoryService.update(id, categoryRequest);
     }
 
     @DeleteMapping("/{id}")
