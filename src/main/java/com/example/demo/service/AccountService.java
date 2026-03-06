@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.dto.AccountRequest;
+import com.example.demo.dto.AccountResponse;
 import com.example.demo.model.Account;
 import com.example.demo.repository.AccountRepository;
 
@@ -15,24 +16,29 @@ public class AccountService {
     
     private final AccountRepository accountRepository;
     private final CurrentUserService currentUserService;
+    private final ResponseMapper responseMapper;
 
-    public AccountService(AccountRepository accountRepository, CurrentUserService currentUserService) {
+    public AccountService(AccountRepository accountRepository,
+                          CurrentUserService currentUserService,
+                          ResponseMapper responseMapper) {
         this.accountRepository = accountRepository;
         this.currentUserService = currentUserService;
+        this.responseMapper = responseMapper;
     }
 
-    public List<Account> findAll() {
+    public List<AccountResponse> findAll() {
         long userId = currentUserService.getCurrentUser().getId();
-        return accountRepository.findByUserId(userId);
+        return accountRepository.findByUserId(userId).stream()
+                .map(responseMapper::toAccountResponse)
+                .toList();
     }
 
-    public Account findById(Long id) {
+    public AccountResponse findById(Long id) {
         long userId = currentUserService.getCurrentUser().getId();
-        return accountRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+        return responseMapper.toAccountResponse(findEntityByIdAndUserId(id, userId));
     }
 
-    public Account create(AccountRequest request) {
+    public AccountResponse create(AccountRequest request) {
         Account account = new Account();
         var user = currentUserService.getCurrentUser();
 
@@ -41,11 +47,12 @@ public class AccountService {
         account.setBalance(request.getBalance());
         account.setCurrency(request.getCurrency());
         account.setUser(user);
-        return accountRepository.save(account);
+        return responseMapper.toAccountResponse(accountRepository.save(account));
     }
 
-    public Account update(Long id, AccountRequest request) {
-        Account existing = findById(id);
+    public AccountResponse update(Long id, AccountRequest request) {
+        long userId = currentUserService.getCurrentUser().getId();
+        Account existing = findEntityByIdAndUserId(id, userId);
         var user = currentUserService.getCurrentUser();
 
         existing.setName(request.getName());
@@ -53,11 +60,17 @@ public class AccountService {
         existing.setBalance(request.getBalance());
         existing.setCurrency(request.getCurrency());
         existing.setUser(user);
-        return accountRepository.save(existing);
+        return responseMapper.toAccountResponse(accountRepository.save(existing));
     }
 
     public void delete(Long id) {
-        Account existing = findById(id);
+        long userId = currentUserService.getCurrentUser().getId();
+        Account existing = findEntityByIdAndUserId(id, userId);
         accountRepository.delete(existing);
+    }
+
+    private Account findEntityByIdAndUserId(Long id, long userId) {
+        return accountRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
     }
 }

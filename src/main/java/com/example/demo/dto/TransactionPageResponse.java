@@ -2,21 +2,19 @@ package com.example.demo.dto;
 
 import java.util.List;
 
-import com.example.demo.model.Transaction;
-
 public class TransactionPageResponse {
 
-    private List<Transaction> content;
+    private List<TransactionResponse> content;
     private int page;
     private int size;
     private long totalElements;
     private int totalPages;
 
-    public List<Transaction> getContent() {
+    public List<TransactionResponse> getContent() {
         return content;
     }
 
-    public void setContent(List<Transaction> content) {
+    public void setContent(List<TransactionResponse> content) {
         this.content = content;
     }
 
