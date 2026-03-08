@@ -4,7 +4,13 @@ import com.example.demo.enums.CategoryType;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class CategoryRequest {
 
     @NotBlank
@@ -12,20 +18,4 @@ public class CategoryRequest {
 
     @NotNull
     private CategoryType type;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public CategoryType getType() {
-        return type;
-    }
-
-    public void setType(CategoryType type) {
-        this.type = type;
-    }
 }
