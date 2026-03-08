@@ -23,17 +23,15 @@ import com.example.demo.dto.TransactionResponse;
 import com.example.demo.service.TransactionService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/transactions")
 @Validated
+@RequiredArgsConstructor
 public class TransactionController {
 
     private final TransactionService transactionService;
-
-    public TransactionController(TransactionService transactionService) {
-        this.transactionService = transactionService;
-    }
 
     @GetMapping
     public List<TransactionResponse> getAll() {

@@ -21,18 +21,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
-
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/budgets")
 @Validated
+@RequiredArgsConstructor
 public class BudgetController {
 
     private final BudgetService budgetService;
-    
-    public BudgetController(BudgetService budgetService) {
-        this.budgetService = budgetService;
-    }
 
     @GetMapping
     public List<BudgetResponse> getAll() {

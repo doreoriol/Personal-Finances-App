@@ -8,21 +8,15 @@ import com.example.demo.dto.UserProfileResponse;
 import com.example.demo.dto.UserUpdateRequest;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final CurrentUserService currentUserService;
     private final ResponseMapper responseMapper;
-
-    public UserService(UserRepository userRepository,
-                       CurrentUserService currentUserService,
-                       ResponseMapper responseMapper) {
-        this.userRepository = userRepository;
-        this.currentUserService = currentUserService;
-        this.responseMapper = responseMapper;
-    }
 
     public UserProfileResponse getCurrentUserProfile() {
         return responseMapper.toUserProfileResponse(currentUserService.getCurrentUser());

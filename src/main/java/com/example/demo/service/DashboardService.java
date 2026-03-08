@@ -17,24 +17,16 @@ import com.example.demo.model.Account;
 import com.example.demo.model.Transaction;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.TransactionRepository;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class DashboardService {
 
     private final CurrentUserService currentUserService;
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
     private final ResponseMapper responseMapper;
-
-    public DashboardService(CurrentUserService currentUserService,
-                            AccountRepository accountRepository,
-                            TransactionRepository transactionRepository,
-                            ResponseMapper responseMapper) {
-        this.currentUserService = currentUserService;
-        this.accountRepository = accountRepository;
-        this.transactionRepository = transactionRepository;
-        this.responseMapper = responseMapper;
-    }
 
     public DashboardSummaryResponse getDashboardSummary(Integer year, Integer month) {
         var user = currentUserService.getCurrentUser();
