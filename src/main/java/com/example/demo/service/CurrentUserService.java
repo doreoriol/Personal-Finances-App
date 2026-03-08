@@ -8,15 +8,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class CurrentUserService {
 
     private final UserRepository userRepository;
-
-    public CurrentUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

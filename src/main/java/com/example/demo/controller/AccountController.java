@@ -21,19 +21,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
-
-
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/accounts")
 @Validated
+@RequiredArgsConstructor
 public class AccountController {
         
     private final AccountService accountService;
-
-    public AccountController(AccountService accountService) {
-        this.accountService = accountService;
-    }
 
     @GetMapping
     public List<AccountResponse> getAll() {

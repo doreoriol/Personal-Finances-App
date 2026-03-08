@@ -10,21 +10,15 @@ import com.example.demo.dto.AccountRequest;
 import com.example.demo.dto.AccountResponse;
 import com.example.demo.model.Account;
 import com.example.demo.repository.AccountRepository;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class AccountService {
     
     private final AccountRepository accountRepository;
     private final CurrentUserService currentUserService;
     private final ResponseMapper responseMapper;
-
-    public AccountService(AccountRepository accountRepository,
-                          CurrentUserService currentUserService,
-                          ResponseMapper responseMapper) {
-        this.accountRepository = accountRepository;
-        this.currentUserService = currentUserService;
-        this.responseMapper = responseMapper;
-    }
 
     public List<AccountResponse> findAll() {
         long userId = currentUserService.getCurrentUser().getId();

@@ -10,21 +10,15 @@ import com.example.demo.dto.CategoryRequest;
 import com.example.demo.dto.CategoryResponse;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.model.Category;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryService {
     
     private final CategoryRepository categoryRepository;
     private final CurrentUserService currentUserService;
     private final ResponseMapper responseMapper;
-
-    public CategoryService(CategoryRepository categoryRepository,
-                           CurrentUserService currentUserService,
-                           ResponseMapper responseMapper) {
-        this.categoryRepository = categoryRepository;
-        this.currentUserService = currentUserService;
-        this.responseMapper = responseMapper;
-    }
 
     public List<CategoryResponse> findAll() {
         long userId = currentUserService.getCurrentUser().getId();

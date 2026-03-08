@@ -13,24 +13,16 @@ import com.example.demo.model.Category;
 import com.example.demo.model.User;
 import com.example.demo.repository.BudgetRepository;
 import com.example.demo.repository.CategoryRepository;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class BudgetService {
 
     private final BudgetRepository budgetRepository;
     private final CategoryRepository categoryRepository;
     private final CurrentUserService currentUserService;
     private final ResponseMapper responseMapper;
-
-    public BudgetService(BudgetRepository budgetRepository,
-                         CategoryRepository categoryRepository,
-                         CurrentUserService currentUserService,
-                         ResponseMapper responseMapper) {
-        this.budgetRepository = budgetRepository;
-        this.categoryRepository = categoryRepository;
-        this.currentUserService = currentUserService;
-        this.responseMapper = responseMapper;
-    }
 
     public List<BudgetResponse> findAll() {
         long userId = currentUserService.getCurrentUser().getId();

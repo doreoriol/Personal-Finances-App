@@ -16,24 +16,16 @@ import com.example.demo.model.Transaction;
 import com.example.demo.model.User;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.TransactionRepository;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
     private final CurrentUserService currentUserService;
     private final ResponseMapper responseMapper;
-
-    public TransactionService(TransactionRepository transactionRepository,
-                              CategoryRepository categoryRepository,
-                              CurrentUserService currentUserService,
-                              ResponseMapper responseMapper) {
-        this.transactionRepository = transactionRepository;
-        this.categoryRepository = categoryRepository;
-        this.currentUserService = currentUserService;
-        this.responseMapper = responseMapper;
-    }
 
     public List<TransactionResponse> findAll() {
         long userId = currentUserService.getCurrentUser().getId();

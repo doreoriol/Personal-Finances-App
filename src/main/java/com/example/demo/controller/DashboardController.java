@@ -11,16 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.DashboardSummaryResponse;
 import com.example.demo.dto.TransactionSummaryResponse;
 import com.example.demo.service.DashboardService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/dashboard")
+@RequiredArgsConstructor
 public class DashboardController {
 
     private final DashboardService dashboardService;
-
-    public DashboardController(DashboardService dashboardService) {
-        this.dashboardService = dashboardService;
-    }
 
     @GetMapping("/summary")
     public DashboardSummaryResponse getDashboardSummary(
