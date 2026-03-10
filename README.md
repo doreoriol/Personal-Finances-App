@@ -2,7 +2,7 @@
 
 A backend API for managing personal finances, built with Spring Boot.
 
-This project was created to practice production-style backend engineering beyond a basic CRUD app: authentication with JWT, layered architecture, DTO mapping, database migrations, validation, error handling, and test coverage for key controller flows.
+This project was created to practice production-style backend engineering beyond a basic CRUD app: authentication with JWT, layered architecture, DTO mapping, validation, error handling, and test coverage for key controller flows.
 
 The repository currently contains the backend only.
 
@@ -28,7 +28,6 @@ The API supports:
 - Spring Security
 - Spring Data JPA
 - PostgreSQL
-- Flyway
 - Lombok
 - JWT (`jjwt`)
 - OpenAPI / Swagger UI
@@ -130,7 +129,7 @@ The current local configuration in `application.properties` expects:
 - username: `postgres`
 - password: `postgres`
 
-Flyway will apply the schema migrations automatically on startup.
+Hibernate will create or update the schema automatically on startup in the local development setup.
 
 ### Start the Application
 
