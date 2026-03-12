@@ -1,26 +1,34 @@
-# Personal Finances API
+# MyBalance
 
-A backend API for managing personal finances, built with Spring Boot.
+Full-stack personal finance application with a Spring Boot API and a React frontend.
 
-This project was created to practice production-style backend engineering beyond a basic CRUD app: authentication with JWT, layered architecture, DTO mapping, validation, error handling, and test coverage for key controller flows.
+This project started as a backend-focused portfolio build and now includes a separate frontend client for authentication and dashboard access. The goal is to demonstrate practical full-stack fundamentals: secure auth, layered backend architecture, API design, validation, error handling, and a clean client-side user flow.
 
-The repository currently contains the backend only.
+## What It Includes
 
-## What This Project Does
+- JWT-based authentication with register and login flows
+- User-scoped finance data model for accounts, categories, budgets, and transactions
+- Dashboard summary endpoints on the backend
+- React frontend with login, registration, protected routing, and dashboard shell
+- OpenAPI / Swagger documentation for the backend
+- Controller-level test coverage for key backend flows
 
-The API supports:
+## Current State
 
-- user registration and login
-- JWT-based authentication
-- account management
-- category management
-- monthly budgets by category
-- income and expense transactions
-- dashboard summaries for balances and monthly activity
-- structured API error responses
-- Swagger/OpenAPI documentation
+The backend is functional across the main finance domains.
+
+The frontend currently covers:
+
+- authentication screens connected to the backend
+- persisted session state in the browser
+- protected dashboard routing
+- a styled dashboard UI
+
+The dashboard UI currently uses static sample metrics and recent activity cards rather than live backend dashboard data. That is the main frontend gap at the moment.
 
 ## Tech Stack
+
+### Backend
 
 - Java 21
 - Spring Boot 4
@@ -29,83 +37,54 @@ The API supports:
 - Spring Data JPA
 - PostgreSQL
 - Lombok
-- JWT (`jjwt`)
-- OpenAPI / Swagger UI
-- JUnit 5 + MockMvc
-- Maven
+- JJWT
+- Springdoc OpenAPI
+- JUnit 5
+- MockMvc
 
-## Architecture
+### Frontend
+
+- React 19
+- Vite
+- React Router 7
+- Axios
+- Tailwind CSS 4
+
+## Project Structure
 
 ```text
-src/main/java/com/example/demo
-+-- config        # security, JWT filter, OpenAPI
-+-- controller    # REST endpoints
-+-- dto           # request/response contracts
-+-- enums         # domain enums
-+-- exception     # global exception handling
-+-- model         # JPA entities
-+-- repository    # Spring Data repositories
-+-- service       # business logic and mapping
+.
++-- frontend/                     # React client
+|   +-- src/
+|       +-- api/                 # HTTP client helpers
+|       +-- components/          # shared UI and route guards
+|       +-- context/             # auth state
+|       +-- pages/               # login, register, dashboard
++-- src/main/java/com/example/demo
+|   +-- config/                  # security, JWT filter, OpenAPI
+|   +-- controller/              # REST endpoints
+|   +-- dto/                     # request/response contracts
+|   +-- enums/                   # domain enums
+|   +-- exception/               # global exception handling
+|   +-- model/                   # JPA entities
+|   +-- repository/              # persistence layer
+|   +-- service/                 # business logic
++-- src/test/java/com/example/demo
+|   +-- controller/              # controller tests
 ```
 
-## Main Features
-
-### Authentication
+## Backend Features
 
 - `POST /api/auth/register`
 - `POST /api/auth/login`
-
-### User Profile
-
-- `GET /api/users/me`
-- `PUT /api/users/me`
-- `DELETE /api/users/me`
-
-### Categories
-
-- `GET /api/categories`
-- `GET /api/categories/{id}`
-- `POST /api/categories`
-- `PUT /api/categories/{id}`
-- `DELETE /api/categories/{id}`
-
-### Accounts
-
-- `GET /api/accounts`
-- `GET /api/accounts/{id}`
-- `POST /api/accounts`
-- `PUT /api/accounts/{id}`
-- `DELETE /api/accounts/{id}`
-
-### Budgets
-
-- `GET /api/budgets`
-- `GET /api/budgets/{id}`
-- `POST /api/budgets`
-- `PUT /api/budgets/{id}`
-- `DELETE /api/budgets/{id}`
-
-### Transactions
-
-- `GET /api/transactions`
-- `GET /api/transactions/{id}`
+- `GET|PUT|DELETE /api/users/me`
+- CRUD for `/api/categories`
+- CRUD for `/api/accounts`
+- CRUD for `/api/budgets`
+- CRUD for `/api/transactions`
 - `GET /api/transactions/search`
-- `POST /api/transactions`
-- `PUT /api/transactions/{id}`
-- `DELETE /api/transactions/{id}`
-
-### Dashboard
-
 - `GET /api/dashboard/summary`
 - `GET /api/dashboard/transactions-summary`
-
-## API Documentation
-
-Swagger UI is available at:
-
-```text
-http://localhost:8080/swagger-ui.html
-```
 
 ## Running Locally
 
@@ -113,25 +92,23 @@ http://localhost:8080/swagger-ui.html
 
 - Java 21
 - PostgreSQL
-- Maven or the included Maven Wrapper
+- Node.js 20+ recommended
 
-### Database Setup
-
-Create a local PostgreSQL database:
+### 1. Create the database
 
 ```sql
 CREATE DATABASE personal_finance;
 ```
 
-The current local configuration in `application.properties` expects:
+The backend is currently configured for this local setup:
 
 - database: `personal_finance`
 - username: `postgres`
 - password: `postgres`
 
-Hibernate will create or update the schema automatically on startup in the local development setup.
+Config lives in `src/main/resources/application.properties`.
 
-### Start the Application
+### 2. Start the backend
 
 Windows:
 
@@ -145,88 +122,69 @@ macOS / Linux:
 ./mvnw spring-boot:run
 ```
 
-The API will start on:
+Backend base URL:
 
 ```text
 http://localhost:8080
 ```
 
-## Running Tests
+Swagger UI:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+### 3. Start the frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend dev server:
+
+```text
+http://localhost:5173
+```
+
+The frontend currently calls the backend at `http://localhost:8080/api/auth`.
+
+## Tests
+
+Backend tests:
 
 ```bash
 .\mvnw.cmd test
 ```
 
-## Example Request Flow
+Frontend linting:
 
-1. Register a user
-2. Log in to receive a JWT
-3. Use `Authorization: Bearer <token>` for protected endpoints
-4. Create categories, accounts, budgets, and transactions
-5. Query dashboard endpoints for aggregated finance data
-
-## Example JSON
-
-### Register
-
-```json
-{
-  "name": "Oriol",
-  "email": "oriol@example.com",
-  "password": "password123"
-}
+```bash
+cd frontend
+npm run lint
 ```
 
-### Login
+## Example Flow
 
-```json
-{
-  "email": "oriol@example.com",
-  "password": "password123"
-}
-```
+1. Register a new user from the frontend or via `POST /api/auth/register`
+2. Log in and receive a JWT
+3. Access protected routes in the frontend
+4. Use the token for authenticated API requests
+5. Create accounts, categories, budgets, and transactions
 
-### Create a Transaction
+## What This Project Shows
 
-```json
-{
-  "type": "EXPENSE",
-  "amount": 42.50,
-  "description": "Groceries",
-  "date": "2026-03-09",
-  "categoryId": 1,
-  "paymentMethod": "CARD"
-}
-```
+- backend API design with layered Spring architecture
+- authentication and route protection across backend and frontend
+- validation and structured error responses
+- repository/service-level user scoping for multi-user data isolation
+- a separate frontend client consuming backend auth endpoints
 
-## Testing Notes
+## Next Improvements
 
-The project includes controller tests for:
-
-- authentication happy path
-- validation error payloads
-- invalid credentials handling
-- malformed JSON handling
-- backward-compatible transaction payload aliasing (`category_id`)
-
-## Current Limitations / Next Improvements
-
-These are the main things I would improve next:
-
-- move database credentials and JWT secrets out of `application.properties`
-- replace in-memory pagination for transaction search with database-level pagination
-- expand test coverage to service and repository layers
-- add Docker support for local setup
-- add the frontend client that will consume this API
-
-## What I Focused On While Building It
-
-- keeping the codebase easy to read and extend
-- enforcing user scoping at the repository/service level
-- returning stable and useful API error responses
-- structuring the project the way a real backend would be organized
-- improving maintainability with small refactors instead of leaving boilerplate to accumulate
-
-## Repository Status
-
-This backend is in active development and is intended as a portfolio project to showcase backend engineering fundamentals with a practical domain.
+- connect the dashboard UI to live backend dashboard endpoints
+- move secrets and database credentials out of `application.properties`
+- add service and repository test coverage
+- containerize local setup with Docker
+- add transaction, account, and category screens to the frontend
