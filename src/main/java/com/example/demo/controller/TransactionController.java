@@ -1,8 +1,11 @@
 package com.example.demo.controller;
 
 import java.time.LocalDate;
-import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -34,8 +37,12 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @GetMapping
-    public List<TransactionResponse> getAll() {
-        return transactionService.findAll();
+    public Page<TransactionResponse> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "date") String sort) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+        return transactionService.findAll(pageable);
     }
 
     @GetMapping("/search")

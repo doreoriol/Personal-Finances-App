@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,11 +20,11 @@ public class AccountService {
     private final CurrentUserService currentUserService;
     private final ResponseMapper responseMapper;
 
-    public List<AccountResponse> findAll() {
+    public Page<AccountResponse> findAll(Pageable pageable) {
         long userId = currentUserService.getCurrentUser().getId();
-        return accountRepository.findByUserId(userId).stream()
-                .map(responseMapper::toAccountResponse)
-                .toList();
+
+        Page<Account> accounts = accountRepository.findByUserId(userId, pageable);
+        return accounts.map(responseMapper::toAccountResponse);
     }
 
     public AccountResponse findById(Long id) {

@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,11 +24,10 @@ public class BudgetService {
     private final CurrentUserService currentUserService;
     private final ResponseMapper responseMapper;
 
-    public List<BudgetResponse> findAll() {
+    public Page<BudgetResponse> findAll(Pageable pageable) {
         long userId = currentUserService.getCurrentUser().getId();
-        return budgetRepository.findByUserId(userId).stream()
-                .map(responseMapper::toBudgetResponse)
-                .toList();
+        Page<Budget> budgets = budgetRepository.findByUserId(userId, pageable);
+        return budgets.map(responseMapper::toBudgetResponse);
     }
 
     public BudgetResponse findById(Long id) {

@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,11 +30,10 @@ public class TransactionService {
     private final CurrentUserService currentUserService;
     private final ResponseMapper responseMapper;
 
-    public List<TransactionResponse> findAll() {
+    public Page<TransactionResponse> findAll(Pageable pageable) {
         long userId = currentUserService.getCurrentUser().getId();
-        return transactionRepository.findByUserId(userId).stream()
-                .map(responseMapper::toTransactionResponse)
-                .toList();
+        Page<Transaction> transactions = transactionRepository.findByUserId(userId, pageable);
+        return transactions.map(responseMapper::toTransactionResponse);
     }
 
     public TransactionPageResponse findAllPaged(LocalDate from, LocalDate to, Long categoryId, int page, int size) {
